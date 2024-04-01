@@ -30,7 +30,15 @@ jobs:
       - uses: actions/github-script@v4
         id: script
         with:
-          script: return "Hello!"
+          script: |
+            try {
+              import parseGitDiff from 'parse-git-diff';
+              const result = parseGitDiff('git diff origin/main..HEAD');
+              return result
+            } catch(err) {
+              core.error("Error while reading or parsing the JSON")
+              core.setFailed(err)
+            }
           result-encoding: string
       - name: Get result
         run: echo "${{steps.script.outputs.result}}"
