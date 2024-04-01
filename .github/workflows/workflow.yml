@@ -15,3 +15,10 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
+      - name: print-diff
+        shell: bash
+        run: |
+          git fetch origin main
+          git diff origin/main..HEAD > mydiff
+          echo "mydiff = "
+          cat mydiff
