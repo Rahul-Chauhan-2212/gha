@@ -22,3 +22,10 @@ jobs:
           git diff origin/master..HEAD > mydiff
           echo "mydiff = "
           cat mydiff
+      - name: Run linting rules and tests
+        uses: actions/setup-node@v4
+        with:
+          node-version: 16
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run test
