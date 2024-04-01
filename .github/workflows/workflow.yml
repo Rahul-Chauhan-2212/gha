@@ -15,30 +15,21 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
-      - name: print-diff
-        shell: bash
-        run: |
-          git fetch origin master
-          git diff origin/master..HEAD > mydiff
-          echo "mydiff = "
-          cat mydiff
-      - name: Set Up Node
-        uses: actions/setup-node@v4
+     - uses: GrantBirki/git-diff-action@v2.6.0
+        id: git-diff-action
         with:
-          node-version: 16
-      - run: npm install parse-git-diff
-      - uses: actions/github-script@v4
-        id: script
-        with:
-          script: |
-            try {
-              import parseGitDiff from 'parse-git-diff';
-              const result = parseGitDiff('git diff origin/main..HEAD');
-              return result
-            } catch(err) {
-              core.error("Error while reading or parsing the JSON")
-              core.setFailed(err)
-            }
-          result-encoding: string
-      - name: Get result
-        run: echo "${{steps.script.outputs.result}}"
+          json_diff_file_output: diff.json
+          raw_diff_file_output: diff.txt
+          file_output_only: "true"
+
+      # Print the diff in JSON format
+      - name: print json diff
+        env:
+          DIFF: ${{ steps.git-diff-action.outputs.json-diff-path }}
+        run: cat $DIFF
+
+      # Print the diff in raw git format
+      - name: print raw diff
+        env:
+          DIFF: ${{ steps.git-diff-action.outputs.raw-diff-path }}
+        run: cat $DIFF
